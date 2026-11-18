@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Accueil alpin : comparaison</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>Accueil alpin <span>photo unique, mise en page B</span></h1>
+  <nav id="tabs">
+    <button data-tab="grid" class="on">Grille <b id="count-grid"></b></button>
+    <button data-tab="compare">Comparer <b id="count-compare">0</b></button>
+    <button data-tab="anim">Transitions</button>
+    <button data-tab="contrast">Contraste</button>
+    <button data-tab="files">Fichiers livr&eacute;s</button>
+    <button data-tab="legend">L&eacute;gende</button>
+  </nav>
+  <div class="spacer"></div>
+  <button id="fav-count" title="Voir mes favoris">&#9733; <b id="favs">0</b></button>
+  <button id="summary-btn" class="primary">R&eacute;sum&eacute; de mes choix</button>
+</header>
+<p id="http-warning" class="warning" hidden>Cette page est ouverte directement depuis un fichier : le navigateur interdit de relire les pixels des images, donc le rendu ne peut pas &ecirc;tre &eacute;talonn&eacute;. Lancez <code>tools/.venv/bin/python tools/build_alpine_preview.py --serve</code> puis ouvrez <code>http://127.0.0.1:8765/</code> dans le navigateur.</p>
+
+<div id="layout">
+  <aside id="filters">
+    <h2>Combinaisons parlantes</h2>
+    <div id="presets"></div>
+    <h2>Phases</h2><div class="group" data-group="phase"></div>
+    <h2>M&eacute;t&eacute;os</h2><div class="group" data-group="weather"></div>
+    <h2>&Eacute;tats</h2><div class="group" data-group="state"></div>
+    <p class="hint">Les filtres se combinent : la grille montre toutes les associations coch&eacute;es.</p>
+  </aside>
+
+  <main>
+    <section id="tab-grid"><div id="grid"></div><div id="more-wrap"><button id="more">Afficher plus</button></div></section>
+
+    <section id="tab-compare" hidden>
+      <div class="bar">
+        <label>Affichage
+          <select id="cmp-mode"><option value="side">c&ocirc;te &agrave; c&ocirc;te</option><option value="overlay">superpos&eacute; (1 sur 2)</option></select>
+        </label>
+        <label>R&eacute;solution
+          <select id="cmp-res"><option value="hd">fichiers 1920&times;1080</option><option value="uhd">fichiers UHD 3840&times;2160</option></select>
+        </label>
+        <label>Zoom <input id="cmp-zoom" type="range" min="10" max="400" value="50"> <b id="cmp-zoom-v">50 %</b></label>
+        <button id="cmp-pixel" title="Un pixel de l'image pour un pixel de l'&eacute;cran">1 pixel pour 1 pixel</button>
+        <button id="cmp-fit">Ajuster</button>
+        <label id="cmp-op-wrap" hidden>Opacit&eacute; du dessus <input id="cmp-op" type="range" min="0" max="100" value="50"></label>
+        <button id="cmp-tv">Plein &eacute;cran TV</button>
+        <button id="cmp-detail">D&eacute;tail &agrave; 100 %</button>
+        <button id="cmp-clear">Vider</button>
+      </div>
+      <p id="cmp-empty" class="hint">Cochez 2 &agrave; 4 vignettes dans la grille (case &laquo; comparer &raquo;).</p>
+      <div id="panes"></div>
+    </section>
+
+    <section id="tab-contrast" hidden>
+      <div class="bar">
+        <button id="ct-model" class="primary">Calculer le mod&egrave;le (72 combinaisons)</button>
+        <button id="ct-pixels">Mesurer sur les pixels rendus</button>
+        <span id="ct-status" class="hint"></span>
+      </div>
+      <div id="ct-table"></div>
+    </section>
+
+    <section id="tab-anim" hidden>
+      <div class="bar">
+        <label>Mode
+          <select id="an-mode"><option value="day">Journ&eacute;e acc&eacute;l&eacute;r&eacute;e</option><option value="weather">Transition m&eacute;t&eacute;o</option></select>
+        </label>
+        <button id="an-play" class="primary">&#9654; Lecture</button>
+        <button id="an-back" title="Reculer d'un pas">&minus;</button><button id="an-fwd" title="Avancer d'un pas">+</button>
+        <label>Vitesse <select id="an-speed"></select></label>
+        <label id="an-weather-wrap">M&eacute;t&eacute;o du jour <select id="an-weather"></select></label>
+        <label id="an-time-wrap" hidden>Heure fixe <select id="an-time"><option value="570">09:30</option><option value="780">13:00</option><option value="1020">17:00</option><option value="1320">22:00</option></select></label>
+        <label>Rendu <select id="an-res"><option value="half">lecture 960&times;540</option><option value="hd">1080p</option><option value="uhd">UHD 3840&times;2160</option></select></label>
+        <button id="an-still">Image fixe 1080p</button>
+        <button id="an-strip">Planche d'instants</button>
+      </div>
+      <div class="bar"><input id="an-pos" type="range" min="0" max="1000" value="0" style="flex:1;min-width:260px"><b id="an-label"></b></div>
+      <div id="an-info" class="hint"></div>
+      <canvas id="an-canvas" style="width:100%;max-width:1280px;background:#000;border:1px solid var(--line)"></canvas>
+      <div id="an-strip-out" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px"></div>
+    </section>
+
+    <section id="tab-files" hidden></section>
+    <section id="tab-legend" hidden></section>
+  </main>
+</div>
+
+<div id="tv" hidden>
+  <div id="tv-bar">
+    <span id="tv-title"></span>
+    <button id="tv-res">1080p</button><button id="tv-detail">D&eacute;tail &agrave; 100 %</button><button id="tv-prev">&larr;</button><button id="tv-next">&rarr;</button><button id="tv-close">Fermer (&Eacute;chap)</button>
+  </div>
+  <div id="tv-scroll"><canvas id="tv-canvas"></canvas></div>
+  <div id="tv-legend"></div>
+</div>
+
+<div id="detail" hidden><div class="box wide"><h3>D&eacute;tail &agrave; 100 % (fichiers UHD, un pixel d'image pour un pixel de canvas)</h3>
+  <div class="crops"><figure><canvas id="dt-0" width="800" height="450"></canvas><figcaption>Cr&ecirc;te et bas des chiffres</figcaption></figure>
+  <figure><canvas id="dt-1" width="800" height="450"></canvas><figcaption>Date, salutation et texte</figcaption></figure>
+  <figure><canvas id="dt-2" width="800" height="450"></canvas><figcaption>Lac, flocons et pluie</figcaption></figure></div>
+  <div class="row"><button id="detail-close">Fermer</button></div></div></div>
+
+<div id="modal" hidden><div class="box"><h3>R&eacute;sum&eacute; de mes choix</h3><textarea id="summary" readonly></textarea>
+  <div class="row"><button id="copy" class="primary">Copier</button><button id="modal-close">Fermer</button></div></div></div>
+
+<script src="layout.js"></script>
+<script src="grade.js"></script>
+<script src="data.js"></script>
+<script src="scene.js"></script>
+<script src="app.js"></script>
+<script src="anim.js"></script>
+</body>
+</html>
