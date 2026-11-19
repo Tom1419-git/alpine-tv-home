@@ -6,12 +6,20 @@
 </p>
 
 <p align="center">
-  <img src="docs/accueil-alpin/images/tv-nuit.jpg" alt="Accueil alpin sur une Sony Bravia, de nuit : le Cervin et son reflet, l'heure en grand, trois pilules et un dock de deux rangées" width="860">
+  <img src="docs/accueil-alpin/images/coucher.jpg" alt="Le Cervin et son reflet dans le Riffelsee au coucher du soleil, avec l'heure en grand" width="860">
 </p>
 
 <p align="center">
-  <img src="docs/accueil-alpin/images/apercu-pluie.jpg" alt="Aperçu : pluie fine sur le lac, ciel couvert" width="425">
-  <img src="docs/accueil-alpin/images/apercu-neige.jpg" alt="Aperçu : neige légère, brume sur la vallée" width="425">
+  <img src="docs/accueil-alpin/images/lever.jpg" alt="Lever du soleil : ciel rose sur le lac" width="280">
+  <img src="docs/accueil-alpin/images/matin.jpg" alt="Matin : ciel bleu clair" width="280">
+  <img src="docs/accueil-alpin/images/midi.jpg" alt="Plein jour : ciel bleu et neige sur le Cervin" width="280">
+</p>
+
+<p align="center">
+  <img src="docs/accueil-alpin/images/crepuscule.jpg" alt="Crépuscule : ciel violet, lac sombre" width="425">
+  <img src="docs/accueil-alpin/images/nuit.jpg" alt="Nuit : étoiles et lune au-dessus du Cervin" width="425">
+  <br>
+  <sub>Le même lac, du lever à la nuit. Aperçus générés avec le même calcul de lumière que l'application (voir « Voir le rendu sans TV »).</sub>
 </p>
 
 ### Ce que ça apporte
