@@ -194,9 +194,10 @@
   }
 
   var COLORS = ['#f4f4f4', '#202125', '#f6f6f8', '#f2f2f2', '#d3283a', '#203a8a', '#3d1a49', '#17494e'];
+  var TILES = [['#2f6fd6', '#1c3f86'], ['#1f9d8f', '#0f5b63'], ['#8a4fd0', '#4a2a82'], ['#e0793a', '#a8431f'], ['#d6486a', '#8c2342'], ['#3d9a4f', '#1f5a2e'], ['#d9a62e', '#8f6410'], ['#5d6b82', '#2f394b']];
   var LABELS = ['TV', 'Films', 'Sport', 'Vidéo', 'Musique', 'Jeux', 'Photos', 'Réglages'];
 
-  function dock(ctx, layout, state, cards, noText) {
+  function dock(ctx, layout, state, cards, noText, generic) {
     var band = L.dockBand(layout);
     rr(ctx, band.x, band.y, band.w, band.h, 40); ctx.fillStyle = 'rgba(14,16,20,' + L.BAND_ALPHA + ')'; ctx.fill();
     ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(255,255,255,0.14)'; ctx.stroke();
@@ -208,7 +209,12 @@
       if (hot) { ctx.shadowColor = 'rgba(255,255,255,0.45)'; ctx.shadowBlur = 36; }
       rr(ctx, 0, 0, c.w, c.h, 18); ctx.save(); ctx.clip();
       if (c.below && !hot) ctx.globalAlpha = L.BELOW_ALPHA;
-      if (art && art.complete && art.naturalWidth) ctx.drawImage(art, 0, 0, c.w, c.h);
+      if (generic) {   // tuiles neutres, sans logo : pour les images publiques
+        var g2 = ctx.createLinearGradient(0, 0, c.w, c.h), pal = TILES[idx % TILES.length]; g2.addColorStop(0, pal[0]); g2.addColorStop(1, pal[1]);
+        ctx.fillStyle = g2; ctx.fillRect(0, 0, c.w, c.h);
+        ctx.fillStyle = 'rgba(255,255,255,0.92)'; ctx.textAlign = 'center'; ctx.font = '500 ' + Math.round(c.h * 0.17) + 'px ' + FONT;
+        ctx.fillText(LABELS[idx % 8], c.w / 2, c.h * 0.58);
+      } else if (art && art.complete && art.naturalWidth) ctx.drawImage(art, 0, 0, c.w, c.h);
       else { ctx.fillStyle = COLORS[idx % 8]; ctx.fillRect(0, 0, c.w, c.h); }
       ctx.restore(); ctx.shadowBlur = 0;
       if (hot) { rr(ctx, 0, 0, c.w, c.h, 18); ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(255,255,255,0.95)'; ctx.stroke(); }
@@ -216,7 +222,7 @@
     });
     if (focusIndex >= 0 && !noText) {   // le nom de l'application survolee, au-dessus du dock (le titre du dock)
       ctx.font = '200 96px ' + FONT; ctx.fillStyle = '#fff'; ctx.textAlign = 'left'; 
-      ctx.fillText(focusIndex === 1 ? 'Canal+' : 'Musique', 136, L.cardTop(H) - 100);
+      ctx.fillText(focusIndex === 1 ? (generic ? 'Films' : 'Canal+') : 'Musique', 136, L.cardTop(H) - 100);
     }
   }
 
@@ -308,7 +314,7 @@
       ctx.font = '200 ' + cm.textSize + 'px ' + FONT;
       line(ctx, plans.CLOCK, function () { ctx.fillText(o.time || '20:52', W / 2, cm.baseline); }, 1);
       ctx.font = '400 ' + cm.dateSize + 'px ' + FONT;
-      line(ctx, plans.DATE, function () { spaced(ctx, 'MARDI 17 NOVEMBRE   ·   12°', W / 2, cm.dateY, 0.3); }, 0.92);
+      line(ctx, plans.DATE, function () { spaced(ctx, o.dateText || 'MARDI 17 NOVEMBRE   ·   12°', W / 2, cm.dateY, 0.3); }, 0.92);
       ctx.font = '400 ' + cm.greetSize + 'px ' + FONT;
       line(ctx, plans.GREETING, function () { spaced(ctx, GREETING[phaseKey] || '', W / 2, cm.greetY, 0.3); }, 0.65);
       var cap = cm.baseline - cm.digitH * layout.occlusion, fadeTop = cap - cm.digitH * layout.soft, er = ctx.createLinearGradient(0, fadeTop, 0, cap);
@@ -326,7 +332,7 @@
 
     // 7. vues de l'application
     pills(ctx, !!o.noText);
-    dock(ctx, layout, o.state, o.img.cards, !!o.noText);
+    dock(ctx, layout, o.state, o.img.cards, !!o.noText, !!o.generic);
     if (o.state === 'musique') music(ctx, layout, o.accent || ['#5b6c9b', '#2c3350', '#9fb4ff'], !!o.noText);
     ctx.restore();
 

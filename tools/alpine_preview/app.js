@@ -38,7 +38,7 @@
     var hd = res !== 'uhd';
     return Promise.all([img('pack/' + (hd ? 'photo_1080.jpg' : 'photo.jpg')), img('pack/' + (hd ? 'foreground_1080.png' : 'foreground.png')), cardsP, fontP]).then(function (r) {
       if (!r[0] || !r[1]) throw new Error('fichier du pack absent');
-      return S.render(canvas, { phase: o.phase, weather: o.weather, state: o.state, res: res, data: D, img: { photo: r[0], fg: r[1], cards: r[2] }, seed: 7, bolt: bolt });
+      return S.render(canvas, { phase: o.phase, weather: o.weather, state: o.state, res: res, data: D, img: { photo: r[0], fg: r[1], cards: r[2] }, seed: 7, bolt: bolt, time: o.time, dateText: o.dateText, generic: o.generic });
     });
   }
 

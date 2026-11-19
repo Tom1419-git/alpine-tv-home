@@ -22,6 +22,15 @@
   <sub>Le même lac, du lever à la nuit. Aperçus générés avec le même calcul de lumière que l'application (voir « Voir le rendu sans TV »).</sub>
 </p>
 
+<p align="center">
+  <img src="docs/accueil-alpin/images/apps-jour.jpg" alt="L'accueil en journée avec les pilules d'état et le dock de deux rangées d'applications" width="425">
+  <img src="docs/accueil-alpin/images/apps-coucher.jpg" alt="Au coucher du soleil, une application sélectionnée dans le dock, son nom affiché en grand" width="425">
+  <br>
+  <img src="docs/accueil-alpin/images/apps-nuit.jpg" alt="De nuit, avec le bloc de la musique en cours en haut à gauche et le dock" width="860">
+  <br>
+  <sub>Avec les applications : trois pilules d'état, le dock sur deux rangées, l'application sélectionnée, le bloc musique. Les tuiles sont des exemples neutres.</sub>
+</p>
+
 ### Ce que ça apporte
 
 - **Une seule photo, étalonnée en continu.** Pas de variantes jour et nuit : la luminosité, le contraste, la saturation et
