@@ -7,7 +7,7 @@
                 ['apres-midi', 'Après-midi'], ['coucher', 'Coucher du soleil'], ['crepuscule', 'Crépuscule'], ['nuit', 'Nuit']];
   var WEATHERS = [['clair', 'Ciel clair'], ['partiel', 'Partiellement nuageux'], ['couvert', 'Couvert'], ['brouillard', 'Brouillard'],
                   ['bruine', 'Bruine'], ['pluie', 'Pluie'], ['averses', 'Averses'], ['neige', 'Neige'], ['orage', 'Orage']];
-  var STATES = [['repos', 'Au repos'], ['focus', 'Focus sur le dock'], ['focus2', 'Focus sur la 2e rangée'], ['musique', 'Bloc musique']];
+  var STATES = [['repos', 'Au repos'], ['focus', 'Focus sur le dock'], ['focus2', 'Focus sur la 2e rangée'], ['musique', 'Bloc musique'], ['veille', 'Screensaver'], ['veille-musique', 'Screensaver avec musique']];
   var PRESETS = [['Nuit claire', 'nuit', 'clair'], ['Nuit neigeuse', 'nuit', 'neige'], ['Matin brumeux', 'matin', 'brouillard'],
                  ['Midi dégagé', 'midi', 'clair'], ['Coucher dégagé', 'coucher', 'clair'],
                  ['Coucher pluvieux', 'coucher', 'pluie'], ['Nuit pluvieuse', 'nuit', 'pluie'], ['Orage', 'apres-midi', 'orage']];

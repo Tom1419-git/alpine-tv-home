@@ -61,6 +61,7 @@ public final class AlpineHomeView extends View {
     private boolean weatherStale;
     private boolean started;
     private boolean timeValid = true;
+    private boolean dream;
 
     // Apercu : adb shell am start ... --es phase dusk --es weather rain --es clock 20:52
     private String previewPhase;
@@ -129,6 +130,15 @@ public final class AlpineHomeView extends View {
         this.backdrop = backdrop;
         scene.state = null;
         setPreview(s.previewPhase, s.previewCondition, null);
+    }
+
+    /**
+     * Mode screensaver ({@link AlpineDream}) : ni dock ni pilules, donc ni voile sous le dock ni plan de lisibilite pour
+     * leurs zones. L'heure, la date, la photo et la meteo restent identiques a l'accueil.
+     */
+    void setDream(boolean dream) {
+        this.dream = dream;
+        planDirty = true;
     }
 
     /** Change de fond sans reconstruire Home (pack valide a l'instant, ou image illisible : retour a la scene dessinee). */
@@ -321,6 +331,11 @@ public final class AlpineHomeView extends View {
         float[] crest = backdrop.crestCurve();
         if (w == 0 || h == 0 || grid == null || crest == null) return;
         for (SceneZones.Zone z : SceneZones.Zone.values()) {
+            if (dream && SceneZones.whiteFixed(z)) {   // pilules et titre du dock : absents du screensaver
+                toneTarget[z.ordinal()] = 0f;
+                veilTarget[z.ordinal()] = 0f;
+                continue;
+            }
             ContrastPlan.Plan p = SceneZones.plan(z, w, h, grid, crest, scene.grade, scene.mix, planOut, planTmp);
             toneTarget[z.ordinal()] = SceneZones.whiteFixed(z) || !p.darkText ? 0f : 1f;
             veilTarget[z.ordinal()] = p.veilAlpha;
@@ -351,7 +366,7 @@ public final class AlpineHomeView extends View {
         }
         drawVeils(c, w, h, true);          // titre du dock et pilules : des vues posees au-dessus du premier plan
         weatherLayer.draw(c, w, h, scene);
-        drawScrim(c, w, h);
+        if (!dream) drawScrim(c, w, h);
     }
 
     private static Paint fadePaint() {
@@ -423,7 +438,8 @@ public final class AlpineHomeView extends View {
             textW = w;
             timeString = s.timeText();
             dateString = dateLine(s);
-            greetingString = greeting(s.phase);
+            // Un apercu force sur une phase (sans heure) garde la salutation de cette phase ; sinon l'heure decide.
+            greetingString = greeting(previewPhase != null && previewHour < 0 ? s.phase : HomeState.greetingPhase(s.hour));
         }
         // Ecrans OLED : l'heure se decale de quelques pixels chaque minute, pour ne pas marquer la dalle.
         float dx = ((s.minute % 5) - 2) * 2f * density;

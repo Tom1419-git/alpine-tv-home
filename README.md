@@ -31,6 +31,11 @@
   <sub>Avec les applications : trois pilules d'état, le dock sur deux rangées, l'application sélectionnée, le bloc musique. Les tuiles sont des exemples neutres.</sub>
 </p>
 
+<p align="center">
+  <img src="docs/accueil-alpin/images/veille-musique.jpg" alt="Le screensaver : la même scène sans dock, avec le bloc de la musique en cours en bas à gauche" width="860"><br>
+  <sub>Le screensaver, avec la musique en cours.</sub>
+</p>
+
 ### Ce que ça apporte
 
 - **Une seule photo, étalonnée en continu.** Pas de variantes jour et nuit : la luminosité, le contraste, la saturation et
@@ -43,6 +48,11 @@
   sans cadre, ni ombre, ni plaque. Seuils tenus : 4,5:1 pour le texte et 3:1 pour l'horloge, vérifiés sur les pixels
   rendus (72 combinaisons d'heure et de météo, 7 zones).
 - **Un dock sur deux rangées et un bloc musique** par les sessions média d'Android, sans compte ni SDK.
+- **Un screensaver assorti.** À la mise en veille, la même scène (photo, lumière, météo, heure) remplace les images de
+  Google, sans dock ni réglages, avec le bloc musique quand quelque chose joue. L'installation le règle toute seule et
+  note l'ancien pour pouvoir le remettre.
+- **Une salutation qui suit l'heure** : bonjour le matin, bonne journée l'après-midi, bonsoir à partir de 17 h, bonne nuit
+  après 22 h.
 - **Un lanceur d'origine intact.** L'accueil d'origine reste installé, et le réglage « Accueil météo » le rend tel quel.
 - **Léger.** APK de 643 405 octets, photo en pack séparé (11,6 Mo).
 
@@ -59,13 +69,13 @@ défilement image par image, trois résolutions jusqu'à l'UHD, et un auto-test 
 
 ### Installer sur sa TV
 
-Il faut un Android TV avec le débogage réseau (ADB) activé et la clé du Mac acceptée. Le script met à jour l'application en place, transfère le pack photo, puis fait de l'accueil alpin l'accueil par défaut. Le lanceur d'origine de la TV n'est ni désinstallé ni désactivé.
+Il faut un Android TV avec le débogage réseau (ADB) activé et la clé du Mac acceptée. Le script met à jour l'application en place, transfère le pack photo, puis fait de l'accueil alpin l'accueil par défaut, règle le screensaver alpin et donne à l'accueil l'accès à la musique en cours. Le lanceur d'origine de la TV n'est ni désinstallé ni désactivé, et l'ancien screensaver est noté dans `~/.cleanyourtv/` (`ALPINE_DREAM=0` pour ne pas toucher au screensaver).
 
 ```bash
 SKIP_BUILD=1 STOCK_LAUNCHER=none TV_HOST=<ip de la TV> launcher/build-and-install.sh
 ```
 
-Pour revenir à l'accueil d'origine : Paramètres de la TV, Préférences de l'appareil, Écran d'accueil. Détails et réglages : [docs/accueil-alpin/README.md](docs/accueil-alpin/README.md).
+Pour remettre l'ancien screensaver, le script affiche la commande à lancer (`settings put secure screensaver_components ...`). Pour revenir à l'accueil d'origine : Paramètres de la TV, Préférences de l'appareil, Écran d'accueil. Détails et réglages : [docs/accueil-alpin/README.md](docs/accueil-alpin/README.md).
 
 ### Construire et tester
 

@@ -27,6 +27,18 @@ final class HomeState {
     /** Phase lunaire, 0 (nouvelle) a 1. */
     final double moonPhase;
 
+    /**
+     * Salutation selon l'heure de la journee, pas selon la lumiere : "bonsoir" a 16 h parce que le soleil se couche tot en
+     * novembre n'est pas naturel. Bonjour de 5 h a 12 h, bonne journee jusqu'a 17 h, bonsoir jusqu'a 22 h, bonne nuit ensuite.
+     * Retourne la phase dont le texte est utilise (aube : bonjour, jour : bonne journee, crepuscule : bonsoir, nuit).
+     */
+    static SolarPhase.Phase greetingPhase(int hour) {
+        if (hour >= 5 && hour < 12) return SolarPhase.Phase.DAWN;
+        if (hour >= 12 && hour < 17) return SolarPhase.Phase.DAY;
+        if (hour >= 17 && hour < 22) return SolarPhase.Phase.DUSK;
+        return SolarPhase.Phase.NIGHT;
+    }
+
     HomeState(SolarPhase.Phase phase, WeatherCodes.Condition condition, double tempC, boolean fahrenheit,
               LocalDate date, int hour, int minute, boolean use24h, boolean motion, boolean blackNight,
               boolean stale, double[] sun, double[] moon, double moonPhase) {

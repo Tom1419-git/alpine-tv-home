@@ -188,4 +188,16 @@ if ($HomeKeyService) { Enable-Service 'HomeKeyService' }
 if ($RestoreKeyServices) {
     'pm grant com.gathin.tvhome android.permission.WRITE_SECURE_SETTINGS && echo restore-granted' | & $py -I ..\tools\tv.py --batch
 }
+if ($env:ALPINE_DREAM -ne '0') {
+    # Accueil alpin : acces a la musique et screensaver alpin, regles sans rien demander (voir build-and-install.sh).
+    & $py -I ..\tools\tv.py 'cmd notification allow_listener com.gathin.tvhome/.MusicListener 2>/dev/null; echo music-access-granted'
+    $prevDream = (& $py -I ..\tools\tv.py 'settings get secure screensaver_components' 2>$null | Select-Object -Last 1)
+    if ($prevDream -notlike 'com.gathin.tvhome/*') {
+        $dir = Join-Path $HOME '.cleanyourtv'
+        New-Item -ItemType Directory -Force -Path $dir | Out-Null
+        Set-Content -Path (Join-Path $dir ("screensaver-before-" + ($env:TV_HOST -replace '[^A-Za-z0-9._-]', '_') + '.txt')) -Value $(if ($prevDream) { $prevDream } else { 'null' })
+    }
+    & $py -I ..\tools\tv.py 'settings put secure screensaver_components com.gathin.tvhome/.AlpineDream; settings put secure screensaver_enabled 1; echo screensaver-set'
+    Write-Host "Screensaver: scene alpine. Pour remettre l'ancien: tools\\tv.py 'settings put secure screensaver_components $prevDream'"
+}
 Write-Host 'Installed. Press Home on the remote to see it.'

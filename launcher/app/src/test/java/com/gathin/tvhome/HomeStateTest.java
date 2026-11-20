@@ -39,4 +39,17 @@ public class HomeStateTest {
         assertEquals(WeatherCodes.Condition.RAIN, s.with(SolarPhase.Phase.DUSK, WeatherCodes.Condition.RAIN).condition);
         assertEquals(WeatherCodes.Condition.CLEAR, s.condition);
     }
+
+    @org.junit.Test
+    public void laSalutationSuitLHeureDeLaJourneePasLaLumiere() {
+        assertEquals(SolarPhase.Phase.NIGHT, HomeState.greetingPhase(3));
+        assertEquals(SolarPhase.Phase.DAWN, HomeState.greetingPhase(5));
+        assertEquals(SolarPhase.Phase.DAWN, HomeState.greetingPhase(11));
+        assertEquals(SolarPhase.Phase.DAY, HomeState.greetingPhase(12));
+        assertEquals(SolarPhase.Phase.DAY, HomeState.greetingPhase(16));   // 16 h 22 en novembre : pas "bonsoir"
+        assertEquals(SolarPhase.Phase.DUSK, HomeState.greetingPhase(17));
+        assertEquals(SolarPhase.Phase.DUSK, HomeState.greetingPhase(21));
+        assertEquals(SolarPhase.Phase.NIGHT, HomeState.greetingPhase(22));
+        assertEquals(SolarPhase.Phase.NIGHT, HomeState.greetingPhase(0));
+    }
 }

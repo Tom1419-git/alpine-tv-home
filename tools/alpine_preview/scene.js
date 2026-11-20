@@ -15,6 +15,8 @@
 
   var GREETING = { 'avant-lever': 'BONJOUR', 'lever': 'BONJOUR', 'matin': 'BONNE JOURNÉE', 'midi': 'BONNE JOURNÉE',
     'apres-midi': 'BONNE JOURNÉE', 'coucher': 'BONSOIR', 'crepuscule': 'BONSOIR', 'nuit': 'BONNE NUIT' };
+  /** Meme regle que HomeState.greetingPhase : l'heure de la journee, pas la lumiere. */
+  function greetingAt(h) { return h >= 5 && h < 12 ? 'BONJOUR' : h >= 12 && h < 17 ? 'BONNE JOURNÉE' : h >= 17 && h < 22 ? 'BONSOIR' : 'BONNE NUIT'; }
   var FONT = 'Outfit, sans-serif';
 
   function rng(seed) {
@@ -274,7 +276,7 @@
   // ---- composition ----------------------------------------------------------------------------------------
 
   /**
-   * o : {phase, weather, state ('repos', 'focus', 'focus2', 'musique'), res ('uhd'|'hd'), data, img: {photo, fg, cards},
+   * o : {phase, weather, state ('repos', 'focus', 'focus2', 'musique', 'veille', 'veille-musique'), res ('uhd'|'hd'), data, img: {photo, fg, cards},
    *      layout ('B' par defaut), time, seed, bolt, noText}. Retourne la legende et les plans de lisibilite.
    */
   function render(canvas, o) {
@@ -316,23 +318,29 @@
       ctx.font = '400 ' + cm.dateSize + 'px ' + FONT;
       line(ctx, plans.DATE, function () { spaced(ctx, o.dateText || 'MARDI 17 NOVEMBRE   ·   12°', W / 2, cm.dateY, 0.3); }, 0.92);
       ctx.font = '400 ' + cm.greetSize + 'px ' + FONT;
-      line(ctx, plans.GREETING, function () { spaced(ctx, GREETING[phaseKey] || '', W / 2, cm.greetY, 0.3); }, 0.65);
+      line(ctx, plans.GREETING, function () { spaced(ctx, (o.time ? greetingAt(+o.time.split(':')[0]) : GREETING[phaseKey]) || '', W / 2, cm.greetY, 0.3); }, 0.65);
       var cap = cm.baseline - cm.digitH * layout.occlusion, fadeTop = cap - cm.digitH * layout.soft, er = ctx.createLinearGradient(0, fadeTop, 0, cap);
       er.addColorStop(0, 'rgba(0,0,0,0)'); er.addColorStop(1, 'rgba(0,0,0,1)');
       ctx.globalCompositeOperation = 'destination-out'; ctx.fillStyle = er; ctx.fillRect(0, fadeTop, W, H - fadeTop); ctx.globalCompositeOperation = 'source-over';
       ctx = main; ctx.drawImage(tl, 0, 0, W, H);
     }
 
-    zones.forEach(function (z) { if (G.whiteFixed(z)) veil(ctx, plans[z], G.rect(z, W, H), true); });   // titre du dock et pilules : au-dessus du premier plan
+    var dream = o.state === 'veille' || o.state === 'veille-musique';   // screensaver : ni dock, ni pilules
+    if (!dream) zones.forEach(function (z) { if (G.whiteFixed(z)) veil(ctx, plans[z], G.rect(z, W, H), true); });   // titre du dock et pilules : au-dessus du premier plan
 
     // 6. meteo de premier plan, voile sous le dock
     weatherFront(ctx, m, seed, !!o.bolt, L.clockVisible(W, H), t);
-    var sg = ctx.createLinearGradient(0, H * 0.62, 0, H); sg.addColorStop(0, 'rgba(0,0,0,0)'); sg.addColorStop(1, 'rgba(0,0,0,0.5)');
-    ctx.fillStyle = sg; ctx.fillRect(0, H * 0.62, W, H * 0.38);
+    if (!dream) {
+      var sg = ctx.createLinearGradient(0, H * 0.62, 0, H); sg.addColorStop(0, 'rgba(0,0,0,0)'); sg.addColorStop(1, 'rgba(0,0,0,0.5)');
+      ctx.fillStyle = sg; ctx.fillRect(0, H * 0.62, W, H * 0.38);
+    }
 
     // 7. vues de l'application
-    pills(ctx, !!o.noText);
-    dock(ctx, layout, o.state, o.img.cards, !!o.noText, !!o.generic);
+    if (!dream) {
+      pills(ctx, !!o.noText);
+      dock(ctx, layout, o.state, o.img.cards, !!o.noText, !!o.generic);
+    }
+    if (o.state === 'veille-musique') music(ctx, { music: { x: 96, y: H - 216, w: 640, h: 120 } }, o.accent || ['#5b6c9b', '#2c3350', '#9fb4ff'], !!o.noText);
     if (o.state === 'musique') music(ctx, layout, o.accent || ['#5b6c9b', '#2c3350', '#9fb4ff'], !!o.noText);
     ctx.restore();
 

@@ -259,4 +259,21 @@ if [ "${HOME_KEY_SERVICE:-0}" = 1 ]; then enable_service HomeKeyService; fi
 if [ "${RESTORE_KEY_SERVICES:-0}" = 1 ]; then
   "$PY" -I ../tools/tv.py "pm grant com.gathin.tvhome android.permission.WRITE_SECURE_SETTINGS && echo restore-granted"
 fi
+# Accueil alpin : tout ce qui rend l'accueil complet est regle ici, sans rien demander a la personne.
+#   - le bloc "en lecture" : acces a la session media (MusicListener), qui ne lit aucune notification ;
+#   - le screensaver : la meme scene que l'accueil (AlpineDream), a la place de celui de Google.
+# Le screensaver precedent est note dans ~/.cleanyourtv/ pour pouvoir le remettre. ALPINE_DREAM=0 ne touche a rien de tout cela.
+if [ "${ALPINE_DREAM:-1}" != 0 ]; then
+  "$PY" -I ../tools/tv.py "cmd notification allow_listener com.gathin.tvhome/.MusicListener 2>/dev/null; echo music-access-granted" || true
+  PREV_DREAM=$("$PY" -I ../tools/tv.py "settings get secure screensaver_components" 2>/dev/null | tail -n 1 | tr -d '\r' || true)
+  case "$PREV_DREAM" in
+    com.gathin.tvhome/*) ;;   # deja le notre : on garde la valeur d'origine deja notee
+    *)
+      mkdir -p "${HOME:-.}/.cleanyourtv" 2>/dev/null || true
+      printf '%s\n' "${PREV_DREAM:-null}" > "${HOME:-.}/.cleanyourtv/screensaver-before-$(printf '%s' "$TV_HOST" | tr -c 'A-Za-z0-9._-' '_').txt" 2>/dev/null || true ;;
+  esac
+  "$PY" -I ../tools/tv.py "settings put secure screensaver_components com.gathin.tvhome/.AlpineDream; settings put secure screensaver_enabled 1; echo screensaver-set" || true
+  SAVED_DREAM=$(cat "${HOME:-.}/.cleanyourtv/screensaver-before-$(printf '%s' "$TV_HOST" | tr -c 'A-Za-z0-9._-' '_').txt" 2>/dev/null || echo null)
+  echo "Screensaver: scene alpine. Pour remettre l'ancien: TV_HOST=$TV_HOST tools/tv.py 'settings put secure screensaver_components $SAVED_DREAM'"
+fi
 echo "Installed. Press Home on the remote to see it."
