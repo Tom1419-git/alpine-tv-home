@@ -1,0 +1,12 @@
+{
+  "id": "com.tom1419.alpine",
+  "version": "1.0.0",
+  "vendor": "Tom1419-git",
+  "type": "web",
+  "main": "index.html",
+  "title": "Accueil alpin",
+  "icon": "icon.png",
+  "largeIcon": "largeIcon.png",
+  "uiRevision": 2,
+  "resolution": "1920x1080"
+}

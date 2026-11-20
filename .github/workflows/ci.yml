@@ -19,8 +19,11 @@ jobs:
           python-version: "3.12"
       - name: Install Pillow and numpy
         run: pip install -r tools/requirements-weather.txt
-      - name: Pack and preview tests
-        run: python -m unittest tests.test_alpine_preview tests.test_weather_scene -v
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Pack, preview and webOS tests
+        run: python -m unittest tests.test_alpine_preview tests.test_weather_scene tests.test_webos -v
 
   launcher:
     name: Launcher build and unit tests
