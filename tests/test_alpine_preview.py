@@ -289,8 +289,9 @@ class GeneratorTest(unittest.TestCase):
     def test_fetch_tool_lists_one_photo_and_never_a_thumbnail(self):
         sys.path.insert(0, str(ROOT / "tools"))
         import fetch_weather_masters as f
-        self.assertEqual(list(f.PHOTOS), ["riffelsee-lever"])
+        self.assertEqual(list(f.PHOTOS), ["riffelsee-lever", "braies-matin"])
         self.assertEqual(f.PHOTOS["riffelsee-lever"], ("Matterhorn reflection in the Riffelsee at sunrise.jpg", "CC BY-SA 4.0"))
+        self.assertEqual(f.PHOTOS["braies-matin"], ("Lago di Braies - Morning.jpg", "CC BY-SA 2.0"))
         src = (ROOT / "tools/fetch_weather_masters.py").read_text(encoding="utf-8")
         self.assertIn('"/thumb/" in url', src)
         self.assertEqual(f.plain('<a href="x">Deralpinbergsteiger &amp; co</a>'), "Deralpinbergsteiger & co")

@@ -282,16 +282,18 @@ class NoUpscaleTest(unittest.TestCase):
 
     def test_the_photo_box_is_16x9_wide_enough_and_inside_its_master(self):
         sources = json.loads(SOURCES.read_text(encoding="utf-8"))
-        self.assertEqual(set(sources), {pws.PHOTO["id"]}, "une seule photo")
-        left, top, right, bottom = pws.PHOTO["box"]
-        w, h = right - left, bottom - top
-        self.assertAlmostEqual(w / h, 16 / 9, delta=0.003)
-        self.assertGreaterEqual(w, pws.UHD[0], "le recadrage natif doit etre au moins aussi large que l'UHD")
-        self.assertGreaterEqual(left, 0)
-        self.assertGreaterEqual(top, 0)
-        self.assertLessEqual(right, sources[pws.PHOTO["id"]]["width"])
-        self.assertLessEqual(bottom, sources[pws.PHOTO["id"]]["height"])
-        self.assertFalse(sources[pws.PHOTO["id"]]["capped"])
+        self.assertEqual(set(sources), set(pws.PHOTOS), "les photos livrees, ni plus ni moins")
+        for pid, entry in pws.PHOTOS.items():
+            box = entry["photo"]["box"]
+            left, top, right, bottom = box
+            w, h = right - left, bottom - top
+            self.assertAlmostEqual(w / h, 16 / 9, delta=0.003, msg=pid)
+            self.assertGreaterEqual(w, pws.UHD[0], f"{pid} : le recadrage natif doit etre au moins aussi large que l'UHD")
+            self.assertGreaterEqual(left, 0)
+            self.assertGreaterEqual(top, 0)
+            self.assertLessEqual(right, sources[pid]["width"])
+            self.assertLessEqual(bottom, sources[pid]["height"])
+            self.assertFalse(sources[pid]["capped"])
 
     def test_crop_native_is_a_pixel_crop_with_no_resampling(self):
         with tempfile.TemporaryDirectory() as t:
@@ -365,22 +367,24 @@ class NoUpscaleTest(unittest.TestCase):
 
     def test_sources_json_records_native_provenance(self):
         sources = json.loads(SOURCES.read_text(encoding="utf-8"))
-        self.assertEqual(list(sources), ["riffelsee-lever"])
-        rec = sources["riffelsee-lever"]
-        self.assertEqual(rec["license"], "CC BY-SA 4.0")
-        self.assertTrue(rec["original_url"].startswith("https://upload.wikimedia.org/wikipedia/commons/"))
-        self.assertNotIn("/thumb/", rec["original_url"], "jamais une miniature")
-        self.assertEqual((rec["width"], rec["height"]), (6000, 4000))
-        self.assertRegex(rec["sha256"], r"^[0-9a-f]{64}$")
-        self.assertEqual(rec["author"], "Deralpinbergsteiger")
-        self.assertTrue(rec["commons_url"].startswith("https://commons.wikimedia.org/wiki/File:"))
+        self.assertEqual(sorted(sources), ["braies-matin", "riffelsee-lever"])
+        for pid, licence, size, author in (("riffelsee-lever", "CC BY-SA 4.0", (6000, 4000), "Deralpinbergsteiger"),
+                                           ("braies-matin", "CC BY-SA 2.0", (8213, 5475), "Eric Kilby")):
+            rec = sources[pid]
+            self.assertEqual(rec["license"], licence)
+            self.assertTrue(rec["original_url"].startswith("https://upload.wikimedia.org/wikipedia/commons/"))
+            self.assertNotIn("/thumb/", rec["original_url"], "jamais une miniature")
+            self.assertEqual((rec["width"], rec["height"]), size)
+            self.assertRegex(rec["sha256"], r"^[0-9a-f]{64}$")
+            self.assertEqual(rec["author"], author)
+            self.assertTrue(rec["commons_url"].startswith("https://commons.wikimedia.org/wiki/File:"))
 
     def test_credits_name_the_photo_and_its_licence(self):
         text = (ROOT / "themes/weather/CREDITS.md").read_text(encoding="utf-8")
-        rec = json.loads(SOURCES.read_text(encoding="utf-8"))["riffelsee-lever"]
-        self.assertIn(rec["title"], text)
-        self.assertIn(rec["author"], text)
-        self.assertIn(rec["commons_url"], text)
+        for pid, rec in json.loads(SOURCES.read_text(encoding="utf-8")).items():
+            self.assertIn(rec["author"], text, pid)
+            self.assertIn(rec["commons_url"].replace("_", " ").split("/wiki/File:")[1].split(".jpg")[0].replace(" ", "_"), text.replace(" ", "_"), pid)
+        self.assertIn("Matterhorn reflection in the Riffelsee at sunrise", text)
         for name in pws.PACK_FILES:
             self.assertIn(name, text)
 
