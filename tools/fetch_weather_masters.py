@@ -32,6 +32,7 @@ MIN_WIDTH = 1920
 # id -> (titre exact sur Commons, licence attendue). Une licence differente de celle attendue arrete tout.
 PHOTOS = {
     "riffelsee-lever": ("Matterhorn reflection in the Riffelsee at sunrise.jpg", "CC BY-SA 4.0"),
+    "braies-matin": ("Lago di Braies - Morning.jpg", "CC BY-SA 2.0"),
 }
 
 

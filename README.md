@@ -1,8 +1,8 @@
 <h1 align="center">Accueil alpin pour Android TV</h1>
 
 <p align="center">
-  <b>Une fenêtre ouverte sur le Riffelsee et le Cervin, qui suit le vrai soleil et la vraie météo.</b><br>
-  Un écran d'accueil pour le lanceur CleanYourTV : une seule photo, une lumière continue, une horloge toujours lisible.
+  <b>Une fenêtre ouverte sur les Alpes, qui suit le vrai soleil et la vraie météo.</b><br>
+  Un écran d'accueil pour le lanceur CleanYourTV : deux photos au choix (le Cervin au Riffelsee, le lac de Braies dans les Dolomites), une lumière continue, une horloge toujours lisible.
 </p>
 
 <p align="center">
@@ -23,6 +23,16 @@
 </p>
 
 <p align="center">
+  <img src="docs/accueil-alpin/images/braies-midi.jpg" alt="Seconde photo : le lac de Braies dans les Dolomites en plein jour, mélèzes orangés et reflet" width="425">
+  <img src="docs/accueil-alpin/images/braies-coucher.jpg" alt="Le lac de Braies au coucher du soleil, ciel doré" width="425">
+  <br>
+  <img src="docs/accueil-alpin/images/braies-nuit.jpg" alt="Le lac de Braies de nuit" width="425">
+  <img src="docs/accueil-alpin/images/braies-pluie.jpg" alt="Le lac de Braies sous la pluie" width="425">
+  <br>
+  <sub>La seconde photo, le lac de Braies : un choix dans les réglages de l'accueil alpin (ou à l'installation sur LG). Mêmes calculs de lumière et de météo.</sub>
+</p>
+
+<p align="center">
   <img src="docs/accueil-alpin/images/apps-jour.jpg" alt="L'accueil en journée avec les pilules d'état et le dock de deux rangées d'applications" width="425">
   <img src="docs/accueil-alpin/images/apps-coucher.jpg" alt="Au coucher du soleil, une application sélectionnée dans le dock, son nom affiché en grand" width="425">
   <br>
@@ -38,7 +48,7 @@
 
 ### Ce que ça apporte
 
-- **Une seule photo, étalonnée en continu.** Pas de variantes jour et nuit : la luminosité, le contraste, la saturation et
+- **Deux photos au choix, étalonnées en continu.** Le Cervin au Riffelsee ou le lac de Braies (Dolomites), dans les réglages. Pas de variantes jour et nuit : la luminosité, le contraste, la saturation et
   la teinte glissent avec la hauteur réelle du soleil (lever, midi, coucher, crépuscule, nuit), calculée sur la TV.
   Étoiles, lune, soleil, nuages et brume sont dessinés par l'application.
 - **Une météo intégrée à la photo.** Pluie en traînées de trois profondeurs, bruine, neige à flocons doux, brouillard dans
@@ -51,10 +61,11 @@
 - **Un screensaver assorti.** À la mise en veille, la même scène (photo, lumière, météo, heure) remplace les images de
   Google, sans dock ni réglages, avec le bloc musique quand quelque chose joue. L'installation le règle toute seule et
   note l'ancien pour pouvoir le remettre.
+- **Un screensaver qui s'assombrit la nuit** (10 % le jour, 55 % la nuit, luminosité de la fenêtre baissée aussi ; réglage `alpine_dream_dim`). Sur un écran LCD, seule la baisse de luminosité compte pour la consommation, et certaines TV l'ignorent. Le bloc musique y est agrandi, pochette comprise.
 - **Une salutation qui suit l'heure** : bonjour le matin, bonne journée l'après-midi, bonsoir à partir de 17 h, bonne nuit
   après 22 h.
 - **Un lanceur d'origine intact.** L'accueil d'origine reste installé, et le réglage « Accueil météo » le rend tel quel.
-- **Léger.** APK de 643 405 octets, photo en pack séparé (11,6 Mo).
+- **Léger.** APK de 646 261 octets, photos en packs séparés (11,6 Mo et 14,7 Mo).
 
 ### Voir le rendu sans TV
 
@@ -103,9 +114,9 @@ correction, sans boucler.
    après (webOS 4 et plus). Plus ancienne ou doute : prévens-moi avant d'installer, ce n'est pas garanti.
 4. Demande-moi si le mode développeur est activé. Sinon, lis-moi les étapes avec `node webos/install.js --action help`.
 5. Demande-moi l'adresse IP de la TV (Réglages, Réseau, Wi-Fi, mon réseau), ma ville (météo et soleil), Celsius ou Fahrenheit,
-   heure sur 12 h ou 24 h.
+   heure sur 12 h ou 24 h, et la photo de fond (Riffelsee et le Cervin, lac de Braies, ou une photo différente chaque jour).
 6. Lance : `node webos/install.js --action install --ip <IP> --city "<ville>" --yes` (ajoute `--fahrenheit` et/ou `--12h` si je
-   les ai demandés). À l'étape du code (passphrase), l'appli Developer Mode de la TV affiche un code : demande-le-moi, il se
+   les ai demandés, et `--photo riffelsee`, `--photo braies` ou `--photo auto` selon mon choix). À l'étape du code (passphrase), l'appli Developer Mode de la TV affiche un code : demande-le-moi, il se
    saisit dans le terminal.
 7. À la fin, confirme que l'appli "Accueil alpin" est dans la liste des applications de la TV, et rappelle-moi que la session
    développeur de LG est limitée dans le temps et se prolonge depuis l'appli Developer Mode.
@@ -121,13 +132,15 @@ cd launcher && ./gradlew --no-daemon testReleaseUnitTest lintRelease assembleRel
 python3 -m unittest tests.test_alpine_preview tests.test_weather_scene                  # outils et aperçu (Pillow, numpy)
 ```
 
-408 tests JVM, zéro erreur de lint, APK sous la limite de 737 280 octets (contrôlée par le CI).
+410 tests JVM, zéro erreur de lint, APK sous la limite de 737 280 octets (contrôlée par le CI).
 
 ### Licences des contenus
 
 - Photo : *Matterhorn reflection in the Riffelsee at sunrise*, Deralpinbergsteiger, Wikimedia Commons,
   [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Les images dérivées gardent cette licence
   ([détail des modifications](themes/weather/CREDITS.md)).
+- Seconde photo : *Lago di Braies - Morning*, Eric Kilby, Wikimedia Commons,
+  [CC BY-SA 2.0](https://creativecommons.org/licenses/by-sa/2.0/), mêmes modifications ([détail](themes/weather/CREDITS.md)).
 - Météo : [Open-Meteo.com](https://open-meteo.com/), CC BY 4.0.
 - Code : licence MIT.
 

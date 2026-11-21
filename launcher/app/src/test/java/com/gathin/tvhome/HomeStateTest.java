@@ -52,4 +52,14 @@ public class HomeStateTest {
         assertEquals(SolarPhase.Phase.NIGHT, HomeState.greetingPhase(22));
         assertEquals(SolarPhase.Phase.NIGHT, HomeState.greetingPhase(0));
     }
+
+    @org.junit.Test
+    public void lEcranDeVeilleSAssombritLaNuitEtResteLisibleLeJour() {
+        org.junit.Assert.assertTrue(AlpineDream.dimFor(3) > AlpineDream.dimFor(18));
+        org.junit.Assert.assertTrue(AlpineDream.dimFor(18) > AlpineDream.dimFor(14));
+        for (int h = 0; h < 24; h++) {
+            float d = AlpineDream.dimFor(h);
+            org.junit.Assert.assertTrue(d >= 0f && d <= 0.6f);
+        }
+    }
 }

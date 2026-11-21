@@ -16,6 +16,8 @@ ROOT = Path(__file__).resolve().parent.parent
 APP = Path(__file__).resolve().parent / "app"
 VIEWER = ROOT / "tools/alpine_preview"
 PREVIEW = ROOT / "build/accueil-alpin-preview"
+# Les photos de l'appli : identifiant et dossier d'apercu (tools/build_alpine_preview.py --photo <id> --out <dossier>).
+PHOTOS = [("riffelsee-lever", PREVIEW), ("braies-matin", ROOT / "build/accueil-alpin-preview-braies")]
 
 
 def data_uri(path, mime):
@@ -23,20 +25,22 @@ def data_uri(path, mime):
 
 
 def main():
-    if not (PREVIEW / "pack/photo_1080.jpg").is_file():
-        sys.exit("Lance d'abord : tools/.venv/bin/python tools/build_alpine_preview.py")
+    for pid, folder in PHOTOS:
+        if not (folder / "pack/photo_1080.jpg").is_file():
+            sys.exit("Lance d'abord : tools/.venv/bin/python tools/build_alpine_preview.py --photo %s --out %s" % (pid, folder))
     APP.mkdir(parents=True, exist_ok=True)
     for name in ("layout.js", "grade.js", "scene.js"):
         shutil.copyfile(VIEWER / name, APP / name)
-    # data.js : seulement la partie pack (grille de couleur, courbe de crete), sans les cartes de la TV.
-    src = (PREVIEW / "data.js").read_text(encoding="utf-8")
-    data = json.loads(src[src.index("=") + 1:].rstrip(";\n "))
-    (APP / "data.js").write_text("window.ALPINE_DATA = " + json.dumps({"pack": data["pack"]}, separators=(",", ":")) + ";\n",
+    # data.js : seulement la partie pack de chaque photo (grille de couleur, courbe de crete), sans les cartes de la TV.
+    packs = {}
+    for pid, folder in PHOTOS:
+        src = (folder / "data.js").read_text(encoding="utf-8")
+        packs[pid] = json.loads(src[src.index("=") + 1:].rstrip(";\n "))["pack"]
+    (APP / "data.js").write_text("window.ALPINE_DATA = " + json.dumps({"packs": packs}, separators=(",", ":")) + ";\n",
                                  encoding="utf-8")
-    (APP / "images.js").write_text(
-        "window.ALPINE_IMAGES = " + json.dumps({"photo": data_uri(PREVIEW / "pack/photo_1080.jpg", "image/jpeg"),
-                                                "fg": data_uri(PREVIEW / "pack/foreground_1080.png", "image/png")}) + ";\n",
-        encoding="utf-8")
+    images = {pid: {"photo": data_uri(folder / "pack/photo_1080.jpg", "image/jpeg"),
+                    "fg": data_uri(folder / "pack/foreground_1080.png", "image/png")} for pid, folder in PHOTOS}
+    (APP / "images.js").write_text("window.ALPINE_IMAGES = " + json.dumps(images) + ";\n", encoding="utf-8")
     (APP / "fonts").mkdir(exist_ok=True)
     shutil.copyfile(PREVIEW / "fonts/outfit.ttf", APP / "fonts/outfit.ttf")
     from PIL import Image

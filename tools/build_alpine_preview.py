@@ -19,6 +19,8 @@ import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from prepare_weather_scene import PHOTOS  # noqa: E402  (recadrage et titre de chaque photo)
 VIEWER = Path(__file__).resolve().parent / "alpine_preview"
 FONT = ROOT / "launcher/app/src/main/res/font/outfit.ttf"
 SOURCES = ROOT / "themes/weather/sources.json"
@@ -80,11 +82,13 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--out", default=str(ROOT / "build/accueil-alpin-preview"))
     ap.add_argument("--pack-dir", default=str(PACK), help="dossier du pack (manifest.json et les quatre fichiers)")
+    ap.add_argument("--photo", default=PHOTO_ID, help="identifiant de la photo du pack (riffelsee-lever, braies-matin)")
     ap.add_argument("--docs", action="store_true", help="ecrit docs/accueil-alpin/fichiers-livres.md")
     ap.add_argument("--apk", type=int, help="poids de l'APK (octets), pour --docs")
     ap.add_argument("--serve", action="store_true", help="sert le dossier sur http://127.0.0.1:8765/")
     args = ap.parse_args(argv)
     out = Path(args.out)
+    photo_id = args.photo
     pack_dir = Path(args.pack_dir)
     manifest = pack_dir / "manifest.json"
     if not manifest.is_file():
@@ -99,11 +103,13 @@ def main(argv=None):
         if not (pack_dir / name).is_file():
             raise SystemExit(f"{pack_dir / name} manque : pack incomplet")
         shutil.copy(pack_dir / name, out / "pack" / name)
-    source = json.loads(SOURCES.read_text(encoding="utf-8"))[PHOTO_ID]
+    source = json.loads(SOURCES.read_text(encoding="utf-8"))[photo_id]
+    box = PHOTOS[photo_id]["photo"]["box"]
+    title = PHOTOS[photo_id]["photo"]["title"]
     pack = {"files": m["files"], "total": sum(f["size"] for f in m["files"].values()), "version": m["version"],
             "grid": m["grid"], "crest": m["crest"], "waterline": m["waterline"]}
     data = {"generated": time.strftime("%Y-%m-%d %H:%M"), "pack": pack,
-            "photo": {"id": PHOTO_ID, "title": "Riffelsee, Cervin au lever du soleil", "source": source, "crop_native": list(CROP_NATIVE)}}
+            "photo": {"id": photo_id, "title": title, "source": source, "crop_native": [box[2] - box[0], box[3] - box[1]]}}
     for f in VIEWER.iterdir():
         if f.is_file():
             shutil.copy(f, out / f.name)

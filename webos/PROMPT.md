@@ -20,9 +20,9 @@ correction, sans boucler.
    après (webOS 4 et plus). Plus ancienne ou doute : prévens-moi avant d'installer, ce n'est pas garanti.
 4. Demande-moi si le mode développeur est activé. Sinon, lis-moi les étapes avec `node webos/install.js --action help`.
 5. Demande-moi l'adresse IP de la TV (Réglages, Réseau, Wi-Fi, mon réseau), ma ville (météo et soleil), Celsius ou Fahrenheit,
-   heure sur 12 h ou 24 h.
+   heure sur 12 h ou 24 h, et la photo de fond (Riffelsee et le Cervin, lac de Braies, ou une photo différente chaque jour).
 6. Lance : `node webos/install.js --action install --ip <IP> --city "<ville>" --yes` (ajoute `--fahrenheit` et/ou `--12h` si je
-   les ai demandés). À l'étape du code (passphrase), l'appli Developer Mode de la TV affiche un code : demande-le-moi, il se
+   les ai demandés, et `--photo riffelsee`, `--photo braies` ou `--photo auto` selon mon choix). À l'étape du code (passphrase), l'appli Developer Mode de la TV affiche un code : demande-le-moi, il se
    saisit dans le terminal.
 7. À la fin, confirme que l'appli "Accueil alpin" est dans la liste des applications de la TV, et rappelle-moi que la session
    développeur de LG est limitée dans le temps et se prolonge depuis l'appli Developer Mode.

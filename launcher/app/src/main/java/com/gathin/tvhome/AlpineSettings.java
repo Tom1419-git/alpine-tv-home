@@ -20,6 +20,8 @@ final class AlpineSettings {
     static final String BLACK_NIGHT = "alpine_black_night";
     static final String PHOTO = "alpine_photo";
     static final String MUSIC = "alpine_music";
+    static final String PHOTO_ID = "alpine_photo_id";
+    static final String DREAM_DIM = "alpine_dream_dim";
     static final String PREVIEW_PHASE = "alpine_preview_phase";
     static final String PREVIEW_COND = "alpine_preview_cond";
 
@@ -38,6 +40,8 @@ final class AlpineSettings {
     final boolean blackNight;
     final boolean photo;
     final boolean music;
+    /** Screensaver : image assombrie et luminosite baissee selon l'heure (actif par defaut). */
+    final boolean dreamDim;
     /** Apercu choisi dans les reglages ("" : valeur reelle). */
     final String previewPhase;
     final String previewCondition;
@@ -53,6 +57,7 @@ final class AlpineSettings {
         blackNight = p.getBoolean(BLACK_NIGHT, false);
         photo = p.getBoolean(PHOTO, true);
         music = p.getBoolean(MUSIC, true);
+        dreamDim = p.getBoolean(DREAM_DIM, true);
         previewPhase = p.getString(PREVIEW_PHASE, "");
         previewCondition = p.getString(PREVIEW_COND, "");
     }

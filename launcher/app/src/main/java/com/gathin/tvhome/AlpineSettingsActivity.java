@@ -73,6 +73,7 @@ public final class AlpineSettingsActivity extends Activity {
     /** Lignes ajoutees par les jalons suivants (pack photo, musique, credits). */
     private void extraRows() {
         toggle(R.string.alpine_photo_row, AlpineSettings.PHOTO, true);
+        photoChoice();
         packRow();
         toggle(R.string.alpine_music_row, AlpineSettings.MUSIC, true);
         TextView access = row();
@@ -94,6 +95,25 @@ public final class AlpineSettingsActivity extends Activity {
                 .setMessage(R.string.alpine_credits_text)
                 .setPositiveButton(android.R.string.ok, null)
                 .show());
+    }
+
+    /** Choix de la photo : un appui passe a la suivante. */
+    private void photoChoice() {
+        TextView v = row();
+        final int[] names = {R.string.alpine_photo_riffelsee, R.string.alpine_photo_braies};
+        refreshers.add(() -> v.setText(getString(R.string.alpine_photo_choice_row, getString(names[photoIndex()]))));
+        v.setOnClickListener(x -> {
+            prefs.edit().putString(AlpineSettings.PHOTO_ID,
+                    WeatherPack.PHOTO_IDS[(photoIndex() + 1) % WeatherPack.PHOTO_IDS.length]).apply();
+            changed();
+            refresh();
+        });
+    }
+
+    private int photoIndex() {
+        String id = prefs.getString(AlpineSettings.PHOTO_ID, WeatherPack.PHOTO_IDS[0]);
+        for (int i = 0; i < WeatherPack.PHOTO_IDS.length; i++) if (WeatherPack.PHOTO_IDS[i].equals(id)) return i;
+        return 0;
     }
 
     /** Etat du pack photo : verifie en arriere-plan (hachage des images), puis affiche sur la ligne. */

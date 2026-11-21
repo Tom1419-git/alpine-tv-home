@@ -329,7 +329,7 @@
     if (!dream) zones.forEach(function (z) { if (G.whiteFixed(z)) veil(ctx, plans[z], G.rect(z, W, H), true); });   // titre du dock et pilules : au-dessus du premier plan
 
     // 6. meteo de premier plan, voile sous le dock
-    weatherFront(ctx, m, seed, !!o.bolt, L.clockVisible(W, H), t);
+    if (!o.noWeather) weatherFront(ctx, m, seed, !!o.bolt, L.clockVisible(W, H), t);   // noWeather : l'application la dessine a part, animee
     if (!dream) {
       var sg = ctx.createLinearGradient(0, H * 0.62, 0, H); sg.addColorStop(0, 'rgba(0,0,0,0)'); sg.addColorStop(1, 'rgba(0,0,0,0.5)');
       ctx.fillStyle = sg; ctx.fillRect(0, H * 0.62, W, H * 0.38);
@@ -377,5 +377,20 @@
     return out;
   }
 
-  root.AlpineScene = { render: render, measure: measure, GREETING: GREETING };
+  /**
+   * Pluie, neige et orage seuls, sur un canevas transparent : de quoi animer la meteo au-dessus d'une scene rendue une fois
+   * par minute (webOS ne peut pas redessiner la photo etalonnee a chaque image). Meme dessin que dans render().
+   */
+  function overlay(canvas, o) {
+    var scale = o.res === 'half' ? 0.5 : 1, cw = W * scale, ch = H * scale, m = o.mix;
+    if (canvas.width !== cw || canvas.height !== ch) { canvas.width = cw; canvas.height = ch; }
+    var ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, cw, ch);
+    if (m.wind === undefined) m.wind = 0.18;
+    ctx.save(); ctx.scale(scale, scale);
+    weatherFront(ctx, m, o.seed || 7, false, L.clockVisible(W, H), o.t || 0);
+    ctx.restore();
+  }
+
+  root.AlpineScene = { render: render, overlay: overlay, measure: measure, GREETING: GREETING };
 })(window);

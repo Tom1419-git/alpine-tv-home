@@ -34,6 +34,15 @@ Toutes sont faites par `tools/prepare_weather_scene.py` (pack), à partir du mas
   la pluie, la neige et l'orage, sans flou, sans accentuation ni débruitage. Les fichiers du pack sont donc la photo non
   étalonnée. Étoiles, lune, soleil, nuages, brume et météo sont dessinés par l'application ; aucun n'est dans la photo.
 
+## Seconde photo : Lago di Braies
+
+Photographie : Eric Kilby, « Lago di Braies - Morning », Wikimedia Commons, licence **CC BY-SA 2.0**
+(https://creativecommons.org/licenses/by-sa/2.0/), https://commons.wikimedia.org/wiki/File:Lago_di_Braies_-_Morning.jpg.
+
+Mêmes modifications que la première : recadrage 16:9 (8000×4500 dans le master 8213×5475, sans agrandissement), réduction à
+3840×2160 et 1920×1080, détourage du terrain pour le calque de premier plan, étalonnage fait par l'application. Les images
+modifiées restent sous CC BY-SA 2.0. Pack : `weather_pack_braies.zip`, choisi dans les réglages de l'accueil alpin.
+
 ## Fichiers du pack livré
 
 | Fichier | Source | Modifications |

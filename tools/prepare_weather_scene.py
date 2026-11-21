@@ -70,6 +70,33 @@ CREDITS = {
     "source": "https://commons.wikimedia.org/wiki/File:Matterhorn_reflection_in_the_Riffelsee_at_sunrise.jpg",
 }
 
+# Les photos du pack : chacune a son recadrage, sa ligne d'eau, ses retouches de crete et ses credits. `use()` choisit celle
+# que les fonctions ci-dessous preparent (PHOTO, WATERLINE et CREDITS sont lus par elles).
+PHOTOS = {
+    "riffelsee-lever": {"photo": PHOTO, "waterline": WATERLINE, "credits": CREDITS},
+    # Lago di Braies, Dolomites : ciel lisse, crete nette, lac et reflet. Master 8213x5475 ; recadrage 8000x4500 qui pose
+    # l'horizon du lac a 54,8 % de la hauteur.
+    "braies-matin": {
+        "photo": {"id": "braies-matin", "title": "Lago di Braies, Dolomites, au matin", "box": (100, 537, 8100, 5037), "overrides": []},
+        "waterline": 0.555,
+        "credits": {
+            "author": "Eric Kilby",
+            "license": "CC BY-SA 2.0",
+            "license_url": "https://creativecommons.org/licenses/by-sa/2.0/",
+            "source": "https://commons.wikimedia.org/wiki/File:Lago_di_Braies_-_Morning.jpg",
+        },
+    },
+}
+
+
+def use(photo_id):
+    """Choisit la photo preparee par les fonctions du module."""
+    global PHOTO, WATERLINE, CREDITS
+    if photo_id not in PHOTOS:
+        raise SceneError(f"photo inconnue : {photo_id} (connues : {', '.join(PHOTOS)})")
+    entry = PHOTOS[photo_id]
+    PHOTO, WATERLINE, CREDITS = entry["photo"], entry["waterline"], entry["credits"]
+
 
 class SceneError(Exception):
     """Une image ou un masque est refuse : rien n'est ecrit."""
@@ -468,6 +495,7 @@ def repack(folder, pack):
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--photo", default="riffelsee-lever", help="identifiant de la photo (riffelsee-lever, braies-matin)")
     ap.add_argument("--master", help="master NATIF 6000x4000 (themes/weather/masters-native/riffelsee-lever.jpg)")
     ap.add_argument("--out", help="dossier de sortie (les quatre fichiers et manifest.json)")
     ap.add_argument("--pack", help="ecrit weather_pack.zip")
@@ -475,6 +503,7 @@ def main(argv=None):
     ap.add_argument("--repack", help="dossier dont un foreground.png a ete remplace a la main : refait le pack (avec --pack)")
     args = ap.parse_args(argv)
     try:
+        use(args.photo)
         if args.verify:
             verify_foreground(args.verify)
             print("foreground.png propre")

@@ -84,15 +84,16 @@ $catalogOut = & $py -I ..\tools\tv.py $catalogInstall
 Write-Host $catalogOut
 
 # Accueil alpin : le pack photo (jamais dans l'APK) est transfere de la meme facon, s'il existe.
-$weatherPack = '..\themes\weather\weather_pack.zip'
-if (Test-Path $weatherPack) {
+foreach ($weatherPack in @('..\themes\weather\weather_pack.zip', '..\themes\weather\weather_pack_braies.zip')) {
+    if (-not (Test-Path $weatherPack)) { continue }
+    $packName = Split-Path $weatherPack -Leaf
     $packMd5 = (Get-FileHash $weatherPack -Algorithm MD5).Hash.ToLowerInvariant()
     & $py -I ..\tools\b64push.py $weatherPack /data/local/tmp/cyt-weather-pack.zip
-    if ($LASTEXITCODE -ne 0) { throw 'weather pack upload failed' }
-    $packInstall = 'content write --uri content://com.gathin.tvhome.theme/weather_pack.zip < /data/local/tmp/cyt-weather-pack.zip && content read --uri content://com.gathin.tvhome.theme/weather_pack.zip > /data/local/tmp/cyt-weather-pack-check && md5sum /data/local/tmp/cyt-weather-pack-check; rm -f /data/local/tmp/cyt-weather-pack.zip /data/local/tmp/cyt-weather-pack-check'
+    if ($LASTEXITCODE -ne 0) { throw "$packName upload failed" }
+    $packInstall = "content write --uri content://com.gathin.tvhome.theme/$packName < /data/local/tmp/cyt-weather-pack.zip && content read --uri content://com.gathin.tvhome.theme/$packName > /data/local/tmp/cyt-weather-pack-check && md5sum /data/local/tmp/cyt-weather-pack-check; rm -f /data/local/tmp/cyt-weather-pack.zip /data/local/tmp/cyt-weather-pack-check"
     $packOut = & $py -I ..\tools\tv.py $packInstall
     Write-Host $packOut
-    if (-not ($packOut -match $packMd5)) { throw 'the weather pack did not arrive intact on the TV' }
+    if (-not ($packOut -match $packMd5)) { throw "$packName did not arrive intact on the TV" }
 }
 if ($LASTEXITCODE -ne 0 -or "$catalogOut" -notmatch $catalogMd5) { throw 'theme catalog install failed or checksum did not match' }
 

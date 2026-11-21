@@ -14,7 +14,11 @@
   var MONTHS = ['JANVIER', 'FÉVRIER', 'MARS', 'AVRIL', 'MAI', 'JUIN', 'JUILLET', 'AOÛT', 'SEPTEMBRE', 'OCTOBRE', 'NOVEMBRE', 'DÉCEMBRE'];
   var WEATHER_MS = 30 * 60 * 1000;
   var canvases = [document.getElementById('a'), document.getElementById('b')], front = 1;
-  var images = null, weather = null, res = 'hd', busy = false, again = false;
+  var fxCanvas = document.getElementById('fx'), fxMix = null, fxTarget = null, fxLast = 0, fxSlow = 0, fxRunning = false;
+  var FX_KEYS = ['rain', 'snow', 'wind', 'storm', 'showers'];
+  var PHOTOS = ['riffelsee-lever', 'braies-matin'];
+  var CREDITS = { 'riffelsee-lever': 'Photo : Deralpinbergsteiger, CC BY-SA 4.0', 'braies-matin': 'Photo : Eric Kilby, CC BY-SA 2.0' };
+  var images = {}, weather = null, res = 'hd', busy = false, again = false;
 
   function pad(n) { return (n < 10 ? '0' : '') + n; }
   function load(src) { return new Promise(function (ok, ko) { var i = new Image(); i.onload = function () { ok(i); }; i.onerror = ko; i.src = src; }); }
@@ -62,17 +66,64 @@
     return t;
   }
 
+  /**
+   * Pluie et neige animees : la scene (photo, ciel, heure) est rendue une fois par minute, les gouttes et les flocons sont
+   * redessines a part, sur un canevas transparent a demi-resolution, une trentaine de fois par seconde. L'intensite glisse
+   * doucement vers la nouvelle valeur quand la meteo change. Si la TV est lente, la cadence tombe a 15 images par seconde.
+   */
+  function fxFrame(ts) {
+    if (!fxTarget) { fxRunning = false; return; }
+    var i, k;
+    for (i = 0; i < FX_KEYS.length; i++) {
+      k = FX_KEYS[i];
+      fxMix[k] += (fxTarget[k] - fxMix[k]) * 0.04;
+    }
+    var active = fxMix.rain > 0.01 || fxMix.snow > 0.01 || fxMix.storm > 0.01 || fxTarget.rain > 0.01 || fxTarget.snow > 0.01 || fxTarget.storm > 0.01;
+    var interval = fxSlow > 5 ? 66 : 33;
+    if (active && ts - fxLast >= interval) {
+      var t0 = Date.now();
+      try { S.overlay(fxCanvas, { mix: fxMix, t: Date.now() / 1000 % 3600, res: 'half', seed: 7 }); } catch (e) { window.ALPINE_ERROR = String(e && e.stack || e); }
+      fxLast = ts;
+      fxSlow = Date.now() - t0 > 30 ? fxSlow + 1 : Math.max(0, fxSlow - 1);
+    } else if (!active && fxCanvas.width > 1) {
+      fxCanvas.getContext('2d').clearRect(0, 0, fxCanvas.width, fxCanvas.height);
+      fxCanvas.width = 1; fxCanvas.height = 1;
+    }
+    requestAnimationFrame(fxFrame);
+  }
+
+  function setFx(mix) {
+    var i, k;
+    fxTarget = {};
+    for (i = 0; i < FX_KEYS.length; i++) { k = FX_KEYS[i]; fxTarget[k] = mix[k] || 0; }
+    fxTarget.wind = mix.wind === undefined ? 0.18 : mix.wind;
+    if (!fxMix) { fxMix = {}; for (i = 0; i < FX_KEYS.length; i++) { k = FX_KEYS[i]; fxMix[k] = fxTarget[k]; } }
+    if (!fxRunning) { fxRunning = true; requestAnimationFrame(fxFrame); }
+  }
+
+  /** La photo du jour : celle du reglage, ou une photo differente chaque jour avec "auto". */
+  function photoFor(now) {
+    if (C.photo === 'auto') {
+      var day = Math.floor((now.getTime() - now.getTimezoneOffset() * 60000) / 86400000);
+      return PHOTOS[day % PHOTOS.length];
+    }
+    return PHOTOS.indexOf(C.photo) >= 0 ? C.photo : PHOTOS[0];
+  }
+
   /** Dessine la scene courante dans le canevas cache, puis la fond avec l'ancienne. */
   function draw() {
     if (busy) { again = true; return; }
     busy = true;
-    var now = new Date(), t0 = Date.now(), cv = canvases[1 - front];
+    var now = new Date(), t0 = Date.now(), cv = canvases[1 - front], pid = photoFor(now);
     try {
-      S.render(cv, { mix: mixNow(now), t: now.getTime() / 1000 % 3600, state: 'veille', res: res, data: D,
-        img: { photo: images.photo, fg: images.fg, cards: [] }, seed: 7, time: timeText(now), dateText: dateText(now) });
+      var mix = mixNow(now);
+      setFx(mix);
+      S.render(cv, { mix: mix, noWeather: true, t: now.getTime() / 1000 % 3600, state: 'veille', res: res, data: { pack: D.packs[pid] },
+        img: { photo: images[pid].photo, fg: images[pid].fg, cards: [] }, seed: 7, time: timeText(now), dateText: dateText(now) });
       canvases[front].className = '';
       cv.className = 'on';
       front = 1 - front;
+      document.getElementById('credit').firstChild.nodeValue = CREDITS[pid] + ' · Météo : Open-Meteo';
     } catch (e) { window.ALPINE_ERROR = String(e && e.stack || e); }
     if (Date.now() - t0 > 4500 && res === 'hd') res = 'half';   // TV lente : on dessine en 960 x 540, etire a l'ecran
     busy = false;
@@ -87,10 +138,13 @@
 
   function start() {
     try { weather = JSON.parse(localStorage.getItem('alpine-weather')); } catch (e) { weather = null; }
-    Promise.all([load(IM.photo), load(IM.fg), document.fonts && document.fonts.load ? document.fonts.load('200 100px Outfit') : null,
-                 document.fonts && document.fonts.load ? document.fonts.load('400 20px Outfit') : null])
+    var ids = C.photo === 'auto' ? PHOTOS : [photoFor(new Date())], jobs = [];
+    ids.forEach(function (id) { jobs.push(load(IM[id].photo), load(IM[id].fg)); });
+    jobs.push(document.fonts && document.fonts.load ? document.fonts.load('200 100px Outfit') : null,
+              document.fonts && document.fonts.load ? document.fonts.load('400 20px Outfit') : null);
+    Promise.all(jobs)
       .then(function (r) {
-        images = { photo: r[0], fg: r[1] };
+        ids.forEach(function (id, i) { images[id] = { photo: r[2 * i], fg: r[2 * i + 1] }; });
         draw();
         scheduleMinute();
         fetchWeather().then(draw);

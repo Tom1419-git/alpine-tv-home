@@ -24,6 +24,15 @@ class WebosAppTest(unittest.TestCase):
         for src in re.findall(r'<script src="([^"]+)"', html):
             self.assertTrue((APP / src).is_file(), src)
 
+    def test_pluie_et_neige_animees_a_part(self):
+        # la scene est rendue une fois par minute sans meteo ; les gouttes et flocons sont dessines a part, sur leur canevas.
+        main = (APP / "main.js").read_text(encoding="utf-8")
+        self.assertIn("noWeather: true", main)
+        self.assertIn("S.overlay(", main)
+        self.assertIn("requestAnimationFrame", main)
+        self.assertIn('id="fx"', (APP / "index.html").read_text(encoding="utf-8"))
+        self.assertIn("overlay: overlay", (APP / "scene.js").read_text(encoding="utf-8"))
+
     def test_es5_pour_webos_4(self):
         # webOS 4 embarque Chromium 53 : ni fleches, ni let/const, ni async dans les fichiers ecrits pour l'appli.
         src = (APP / "main.js").read_text(encoding="utf-8")
@@ -32,8 +41,11 @@ class WebosAppTest(unittest.TestCase):
 
     def test_images_en_data_uri(self):
         # Une image servie en file:// interdit la lecture des pixels du canvas : elles doivent etre integrees.
-        head = (APP / "images.js").read_bytes()[:80]
+        head = (APP / "images.js").read_bytes()[:200]
         self.assertIn(b"data:image/jpeg;base64,", head)
+        for photo in (b"riffelsee-lever", b"braies-matin"):
+            self.assertIn(photo, (APP / "images.js").read_bytes())
+            self.assertIn(photo, (APP / "data.js").read_bytes())
 
     def test_les_moteurs_sont_ceux_de_l_apercu(self):
         for name in ("layout.js", "grade.js", "scene.js"):

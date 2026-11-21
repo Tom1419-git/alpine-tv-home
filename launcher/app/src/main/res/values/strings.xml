@@ -196,6 +196,9 @@
     <string name="alpine_invalid_place">Invalid coordinates: the fixed times of day are used.</string>
     <string name="alpine_city_row_title">Place</string>
     <string name="alpine_photo_row">Photo scene: %1$s</string>
+    <string name="alpine_photo_choice_row">Photo: %1$s</string>
+    <string name="alpine_photo_riffelsee">Riffelsee and the Matterhorn</string>
+    <string name="alpine_photo_braies">Lago di Braies, Dolomites</string>
     <string name="alpine_pack_row">Photo pack: %1$s</string>
     <string name="alpine_pack_checking">checking</string>
     <string name="alpine_pack_ok">installed</string>
@@ -203,7 +206,7 @@
     <string name="alpine_pack_absent">absent, drawn scene used</string>
     <string name="alpine_pack_invalid">invalid, drawn scene used</string>
     <string name="alpine_credits_row">Photo credits</string>
-    <string name="alpine_credits_text">Photograph: Deralpinbergsteiger, \"Matterhorn reflection in the Riffelsee at sunrise\", Wikimedia Commons, licence CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/).\n\nChanges: cropped to 16:9, graded continuously from the sun position and the weather, cut out to make the foreground layer. The modified images stay under CC BY-SA 4.0.\n\nWeather data by Open-Meteo.com (CC BY 4.0).</string>
+    <string name="alpine_credits_text">Photograph: Deralpinbergsteiger, \"Matterhorn reflection in the Riffelsee at sunrise\", Wikimedia Commons, licence CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/).\n\nChanges: cropped to 16:9, graded continuously from the sun position and the weather, cut out to make the foreground layer. The modified images stay under CC BY-SA 4.0.\n\nPhotograph: Eric Kilby, \"Lago di Braies - Morning\", Wikimedia Commons, licence CC BY-SA 2.0 (https://creativecommons.org/licenses/by-sa/2.0/), same changes.\n\nWeather data by Open-Meteo.com (CC BY 4.0).</string>
     <string name="alpine_music_row">Music block: %1$s</string>
     <string name="alpine_notif_row">Notification access (music): %1$s</string>
     <string name="alpine_notif_granted">granted</string>

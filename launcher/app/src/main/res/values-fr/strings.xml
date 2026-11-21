@@ -135,6 +135,9 @@
     <string name="alpine_invalid_place">Coordonnées invalides : les moments de la journée fixes sont utilisés.</string>
     <string name="alpine_city_row_title">Lieu</string>
     <string name="alpine_photo_row">Scène photo : %1$s</string>
+    <string name="alpine_photo_choice_row">Photo : %1$s</string>
+    <string name="alpine_photo_riffelsee">Riffelsee et le Cervin</string>
+    <string name="alpine_photo_braies">Lago di Braies, Dolomites</string>
     <string name="alpine_pack_row">Pack photo : %1$s</string>
     <string name="alpine_pack_checking">vérification</string>
     <string name="alpine_pack_ok">installé</string>
@@ -142,7 +145,7 @@
     <string name="alpine_pack_absent">absent, scène dessinée utilisée</string>
     <string name="alpine_pack_invalid">invalide, scène dessinée utilisée</string>
     <string name="alpine_credits_row">Crédits photo</string>
-    <string name="alpine_credits_text">Photographie : Deralpinbergsteiger, \"Matterhorn reflection in the Riffelsee at sunrise\", Wikimedia Commons, licence CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/).\n\nModifications : recadrage en 16:9, étalonnage continu selon la position du soleil et la météo, détourage pour le calque de premier plan. Les images modifiées restent sous licence CC BY-SA 4.0.\n\nWeather data by Open-Meteo.com (CC BY 4.0).</string>
+    <string name="alpine_credits_text">Photographie : Deralpinbergsteiger, \"Matterhorn reflection in the Riffelsee at sunrise\", Wikimedia Commons, licence CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/).\n\nModifications : recadrage en 16:9, étalonnage continu selon la position du soleil et la météo, détourage pour le calque de premier plan. Les images modifiées restent sous licence CC BY-SA 4.0.\n\nPhotographie : Eric Kilby, \"Lago di Braies - Morning\", Wikimedia Commons, licence CC BY-SA 2.0 (https://creativecommons.org/licenses/by-sa/2.0/), mêmes modifications.\n\nWeather data by Open-Meteo.com (CC BY 4.0).</string>
     <string name="alpine_music_row">Bloc musique : %1$s</string>
     <string name="alpine_notif_row">Accès aux notifications (musique) : %1$s</string>
     <string name="alpine_notif_granted">accordé</string>

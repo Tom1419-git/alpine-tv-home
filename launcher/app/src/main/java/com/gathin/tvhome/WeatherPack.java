@@ -17,6 +17,9 @@ import java.util.zip.ZipFile;
  */
 final class WeatherPack {
     static final String FILE_NAME = "weather_pack.zip";
+    /** Les photos livrees : identifiant (reglage {@link AlpineSettings#PHOTO_ID}) et nom du pack, dans le meme ordre. */
+    static final String[] PHOTO_IDS = {"riffelsee-lever", "braies-matin"};
+    static final String[] FILE_NAMES = {FILE_NAME, "weather_pack_braies.zip"};
     private static final String OK_KEY = "weather_pack_ok";
     private static final int MAX_MANIFEST = 64 * 1024;
 
@@ -25,9 +28,25 @@ final class WeatherPack {
     private WeatherPack() {
     }
 
+    /** Nom du pack d'une photo ; la photo par defaut pour un identifiant inconnu. */
+    static String fileNameOf(String photoId) {
+        for (int i = 0; i < PHOTO_IDS.length; i++) if (PHOTO_IDS[i].equals(photoId)) return FILE_NAMES[i];
+        return FILE_NAME;
+    }
+
+    /** Vrai pour un nom de pack connu (liste blanche du fournisseur de fichiers). */
+    static boolean isPackName(String name) {
+        for (String n : FILE_NAMES) if (n.equals(name)) return true;
+        return false;
+    }
+
+    /** La photo choisie dans les reglages, ou la photo par defaut si son pack n'est pas (encore) sur la TV. */
     static File file(Context context) {
         File dir = Config.dir(context);
-        return dir == null ? null : new File(dir, FILE_NAME);
+        if (dir == null) return null;
+        SharedPreferences p = context.getSharedPreferences(Config.SETTINGS_NAME, Context.MODE_PRIVATE);
+        File chosen = new File(dir, fileNameOf(p.getString(AlpineSettings.PHOTO_ID, PHOTO_IDS[0])));
+        return chosen.isFile() ? chosen : new File(dir, FILE_NAME);
     }
 
     /** Signature du fichier (taille et date) : l'empreinte n'est recalculee que si le fichier a change. */
@@ -40,7 +59,7 @@ final class WeatherPack {
         File f = file(context);
         if (f == null || !f.isFile()) return false;
         SharedPreferences p = context.getSharedPreferences(Config.SETTINGS_NAME, Context.MODE_PRIVATE);
-        return signature(f).equals(p.getString(OK_KEY, ""));
+        return signature(f).equals(p.getString(OK_KEY + f.getName(), ""));
     }
 
     /** Verification complete (lecture et hachage de tout le pack) : a appeler hors du fil principal. */
@@ -48,7 +67,7 @@ final class WeatherPack {
         File f = file(context);
         if (f == null || !f.isFile()) return Status.ABSENT;
         SharedPreferences p = context.getSharedPreferences(Config.SETTINGS_NAME, Context.MODE_PRIVATE);
-        if (signature(f).equals(p.getString(OK_KEY, ""))) return Status.OK;
+        if (signature(f).equals(p.getString(OK_KEY + f.getName(), ""))) return Status.OK;
         try (ZipFile zip = new ZipFile(f)) {
             WeatherPackManifest m = manifest(zip);
             if (m == null) return Status.INVALID;
@@ -60,7 +79,7 @@ final class WeatherPack {
         } catch (Exception e) {
             return Status.INVALID;
         }
-        p.edit().putString(OK_KEY, signature(f)).apply();
+        p.edit().putString(OK_KEY + f.getName(), signature(f)).apply();
         return Status.OK;
     }
 

@@ -1,6 +1,6 @@
 # Accueil alpin pour LG webOS
 
-La même scène que sur Android TV, en appli pour les TV LG : la photo du Riffelsee et du Cervin dont la lumière suit le vrai
+La même scène que sur Android TV, en appli pour les TV LG : la photo (le Riffelsee et le Cervin, ou le lac de Braies dans les Dolomites, au choix avec `--photo riffelsee|braies|auto`) dont la lumière suit le vrai
 soleil de ta ville, la météo réelle (Open-Meteo), la date et une horloge toujours lisible. Elle se lance depuis la liste des
 applications de la TV.
 
@@ -12,7 +12,7 @@ une **appli web plein écran**.
 - Elle s'ouvre comme n'importe quelle appli ; elle **ne remplace pas** l'écran d'accueil de LG, ni son écran de veille
   (webOS ne le permet pas).
 - La scène est **recalculée chaque minute** (fondu doux), la météo est relue toutes les 30 minutes. La pluie et la neige sont
-  une image fixe, pas animée comme sur Android.
+  animées à part (environ 30 images par seconde, 15 si la TV est lente), au-dessus de la scène.
 - Pas de bloc musique, pas de dock.
 - La salutation, la date et la météo sont en français.
 - **Non testé sur une vraie LG** à la publication : le rendu est vérifié dans un navigateur, l'installation par les outils LG

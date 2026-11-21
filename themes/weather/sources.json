@@ -1,4 +1,18 @@
 {
+  "braies-matin": {
+    "author": "Eric Kilby",
+    "bytes": 55153000,
+    "capped": false,
+    "commons_url": "https://commons.wikimedia.org/wiki/File:Lago_di_Braies_-_Morning.jpg",
+    "height": 5475,
+    "license": "CC BY-SA 2.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/2.0",
+    "native_16x9": false,
+    "original_url": "https://upload.wikimedia.org/wikipedia/commons/3/3f/Lago_di_Braies_-_Morning.jpg",
+    "sha256": "e3e5e28f34eabe0758ae77353b07b7cdb7ff240e178c5b051d2e6331968276cb",
+    "title": "File:Lago di Braies - Morning.jpg",
+    "width": 8213
+  },
   "riffelsee-lever": {
     "author": "Deralpinbergsteiger",
     "bytes": 20397397,

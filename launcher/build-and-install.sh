@@ -134,17 +134,18 @@ if ! printf '%s' "$CATALOG_OUT" | grep -qF "$CATALOG_MD5"; then
 fi
 # Accueil alpin : le pack photo (themes/weather/weather_pack.zip, jamais dans l'APK) est transfere de la meme facon,
 # seulement s'il existe. Sans lui, l'accueil garde la scene dessinee.
-WEATHER_PACK=../themes/weather/weather_pack.zip
-if [ -f "$WEATHER_PACK" ]; then
+for WEATHER_PACK in ../themes/weather/weather_pack.zip ../themes/weather/weather_pack_braies.zip; do
+  [ -f "$WEATHER_PACK" ] || continue
+  PACK_NAME=$(basename "$WEATHER_PACK")
   PACK_MD5=$(md5sum "$WEATHER_PACK" | awk '{print $1}')
   "$PY" -I ../tools/b64push.py "$WEATHER_PACK" /data/local/tmp/cyt-weather-pack.zip
-  PACK_OUT=$("$PY" -I ../tools/tv.py 'content write --uri content://com.gathin.tvhome.theme/weather_pack.zip < /data/local/tmp/cyt-weather-pack.zip && content read --uri content://com.gathin.tvhome.theme/weather_pack.zip > /data/local/tmp/cyt-weather-pack-check && md5sum /data/local/tmp/cyt-weather-pack-check; rm -f /data/local/tmp/cyt-weather-pack.zip /data/local/tmp/cyt-weather-pack-check')
+  PACK_OUT=$("$PY" -I ../tools/tv.py "content write --uri content://com.gathin.tvhome.theme/$PACK_NAME < /data/local/tmp/cyt-weather-pack.zip && content read --uri content://com.gathin.tvhome.theme/$PACK_NAME > /data/local/tmp/cyt-weather-pack-check && md5sum /data/local/tmp/cyt-weather-pack-check; rm -f /data/local/tmp/cyt-weather-pack.zip /data/local/tmp/cyt-weather-pack-check")
   printf '%s\n' "$PACK_OUT"
   if ! printf '%s' "$PACK_OUT" | grep -qF "$PACK_MD5"; then
-    echo "ERROR: the weather pack did not arrive intact on the TV." >&2
+    echo "ERROR: $PACK_NAME did not arrive intact on the TV." >&2
     exit 1
   fi
-fi
+done
 # Replacing the launcher while it is Home lets Android restart it mid-update, and on a TCL G03
 # (Android 11) that instance came up with mOccludesParent=false: Home then left the previous app or
 # HDMI picture on screen (#1101). `am start` below would only reuse it, so stop it first; the start

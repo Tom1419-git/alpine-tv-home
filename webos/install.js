@@ -10,6 +10,7 @@
  *   --name lgtv                            nom de la TV dans les outils LG (defaut : lgtv)
  *   --city "Lausanne"  ou  --lat 46.5 --lon 6.6   position pour la meteo et le soleil
  *   --fahrenheit, --12h                    affichage
+ *   --photo riffelsee|braies|auto          photo de fond (auto : une photo differente chaque jour)
  *   --yes                                  ne pose aucune question de confirmation
  *   --dry-run                              affiche les commandes sans rien lancer
  *
@@ -28,7 +29,7 @@ const OUT_DIR = path.join(__dirname, '..', 'build', 'webos');
 const CONFIG = path.join(APP_DIR, 'config.js');
 
 function parseArgs(argv) {
-  const a = { action: '', ip: '', name: 'lgtv', city: '', lat: null, lon: null, fahrenheit: false, h12: false, yes: false, dry: false };
+  const a = { action: '', ip: '', name: 'lgtv', city: '', lat: null, lon: null, fahrenheit: false, h12: false, photo: '', yes: false, dry: false };
   for (let i = 0; i < argv.length; i++) {
     const k = argv[i];
     const next = () => argv[++i];
@@ -40,6 +41,7 @@ function parseArgs(argv) {
     else if (k === '--lon') a.lon = Number(next());
     else if (k === '--fahrenheit') a.fahrenheit = true;
     else if (k === '--12h') a.h12 = true;
+    else if (k === '--photo') a.photo = next();
     else if (k === '--yes') a.yes = true;
     else if (k === '--dry-run') a.dry = true;
     else if (k === '-h' || k === '--help') a.action = 'help';
@@ -49,6 +51,8 @@ function parseArgs(argv) {
 }
 
 const args = parseArgs(process.argv.slice(2));
+const PHOTO_IDS = { riffelsee: 'riffelsee-lever', 'riffelsee-lever': 'riffelsee-lever', braies: 'braies-matin', 'braies-matin': 'braies-matin', auto: 'auto' };
+if (args.photo && !PHOTO_IDS[args.photo]) { console.error('--photo : riffelsee, braies ou auto'); process.exit(2); }
 let rl = null;
 function ask(question, def) {
   if (args.yes && def !== undefined) return Promise.resolve(def);
@@ -75,7 +79,7 @@ function readConfig() {
     const src = fs.readFileSync(CONFIG, 'utf8');
     return JSON.parse(src.slice(src.indexOf('{'), src.lastIndexOf('}') + 1));
   } catch (e) {
-    return { city: 'Lausanne', lat: 46.516, lon: 6.63282, fahrenheit: false, format24: true };
+    return { city: 'Lausanne', lat: 46.516, lon: 6.63282, fahrenheit: false, format24: true, photo: 'riffelsee-lever' };
   }
 }
 
@@ -116,6 +120,12 @@ async function updateConfig() {
   cfg.city = loc.city; cfg.lat = Math.round(loc.lat * 1e4) / 1e4; cfg.lon = Math.round(loc.lon * 1e4) / 1e4;
   if (args.fahrenheit) cfg.fahrenheit = true;
   if (args.h12) cfg.format24 = false;
+  if (args.photo) cfg.photo = PHOTO_IDS[args.photo];
+  else if (!args.yes) {
+    console.log('Photo de fond :\n  1) Riffelsee et le Cervin\n  2) Lago di Braies (Dolomites)\n  3) Une photo differente chaque jour');
+    const n = await ask('Votre choix :', { 'riffelsee-lever': '1', 'braies-matin': '2', auto: '3' }[cfg.photo] || '1');
+    cfg.photo = { 1: 'riffelsee-lever', 2: 'braies-matin', 3: 'auto' }[n] || cfg.photo || 'riffelsee-lever';
+  }
   writeConfig(cfg);
   console.log('Position : ' + cfg.city + ' (' + cfg.lat + ', ' + cfg.lon + ')');
 }

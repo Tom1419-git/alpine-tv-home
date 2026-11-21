@@ -237,9 +237,8 @@ class PageConsistencyTest(unittest.TestCase):
                 text = f.read_text(encoding="utf-8").lower()
                 for gone in ("stellisee", "misurina", "oeschinensee", "riffelsee-coucher", "tre cime"):
                     self.assertNotIn(gone, text, f"{f.name} : {gone}")
-        masters = ROOT / "themes/weather/masters-native"
-        if masters.is_dir():   # le master natif est telecharge (non versionne) : le controle ne vaut que s'il est la
-            self.assertEqual(sorted(p.name for p in masters.glob("*.jpg")), ["riffelsee-lever.jpg"])
+        masters = {p.name for p in (ROOT / "themes/weather/masters-native").glob("*.jpg")}
+        self.assertLessEqual(masters, {"riffelsee-lever.jpg", "braies-matin.jpg"})   # les deux photos livrees, rien d'autre
 
 
 @unittest.skipUnless(Image is not None, "numpy et Pillow requis (tools/.venv)")
